@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <title>Users</title>
+    <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+<div class="container-fluid min-vh-100">
+    <div sec:authorize="isAuthenticated()" class="row bg-dark text-light">
+        <div class="col-md-10 fs-3">
+            <strong><span sec:authentication="name"></span></strong> with roles:
+            <span
+                    th:each="authority : ${#authentication.getAuthorities()}"
+                    th:text="${authority.getAuthority().replaceFirst('ROLE_', '') + ' '}">
+            </span>
+        </div>
+        <div class="col-md-2 text-end fs-3"><a href="/logout" class="link-secondary">Logout</a></div>
+    </div>
+    <div class="row min-vh-100" style="background-color: white">
+        <div class="col-md-2">
+            <ul class="nav flex-column nav-tabs">
+                <li sec:authorize="isAuthenticated() && hasRole('ADMIN')" class="nav-item dropdown ml-md-auto">
+                    <a class="list-group-item list-group-item-action active" href="/admin">Admin page</a>
+                </li>
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <a class="list-group-item list-group-item-action" href="/user">User Page</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10" style="background-color: whitesmoke">
+            <div class="content">
+                <div class="min-vh-100">
+                    <h1>Admin Page</h1>
+                    <ul class="nav nav-pills mb-3">
+                        <li class="nav-item active">
+                            <button class="nav-link active" id="allUsersTab" data-bs-toggle="pill" data-bs-target="#allUsers" type="button" role="tab" aria-controls="allUsers" aria-selected="true">Users table</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="newUsersTab" data-bs-toggle="pill" data-bs-target="#newUser" type="button" role="tab" aria-controls="newUser" aria-selected="false">Add new user</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="allUsers" class="tab-pane fade show active" aria-labelledby="allUsersTab">
+                            <div class="card">
+                                <div class="card-header"><p><strong>All Users</strong></p></div>
+                                <div class="p-3">
+                                    <table class="table table-striped table-hover" id="mainTableWithUsers">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Firstname</th>
+                                            <th scope="col">Lastname</th>
+                                            <th scope="col">Age</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Username</th>
+                                            <th scope="col">Roles</th>
+                                            <th scope="col">Edit</th>
+                                            <th scope="col">Delete</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="users_table">
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div id="newUser" class="tab-pane fade" aria-labelledby="newUserTab">
+                            <form id="defaultSomeForm">
+                                <div class="row justify-content-center">
+                                    <div class="col-3 mt-5">
+                                        <div class="d-grid gap-4 text-center">
+                                            <div class="form-group">
+                                                <label for="AddNewUserFirstname"><strong>Firstname</strong></label>
+                                                <input type="text" id="AddNewUserFirstname" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="AddNewUserLastname"><strong>Lastname</strong></label>
+                                                <input type="text" id="AddNewUserLastname" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="AddNewUserAge"><strong>Age</strong></label>
+                                                <input type="number" id="AddNewUserAge" class="form-control"  min="1"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="AddNewUserEmail"><strong>Email</strong></label>
+                                                <input type="text" id="AddNewUserEmail" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="AddNewUserUsername"><strong>Username</strong></label>
+                                                <input type="text" id="AddNewUserUsername" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="AddNewUserPassword"><strong>Password</strong></label>
+                                                <input type="password" id="AddNewUserPassword" class="form-control" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="AddNewUserRoles"><strong>Roles</strong></label>
+                                                <select class="form-control" multiple name="rolesList" id="AddNewUserRoles"
+                                                        size="2">
+                                                    <option name="ROLE_USER" value="ROLE_USER" id="1">ROLE_USER</option>
+                                                    <option name="ROLE_ADMIN" value="ROLE_ADMIN" id="2">ROLE_ADMIN</option>
+                                                </select>
+                                            </div>
+                                            <button class="btn btn-success" type="button" id="addNewUserButton">Add new user</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <br>
+
+                    <div class="modal fade" id="someDefaultModal" tabindex="-1" role="dialog"
+                         aria-labelledby="someDefaultModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+
+                                </div>
+
+                                <div class="modal-footer">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"
+        integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT"
+        crossorigin="anonymous"></script>
+
+<script src="/script.js"></script>
+
+</body>
+</html>
