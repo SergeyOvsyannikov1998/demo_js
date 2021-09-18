@@ -4,26 +4,30 @@ import com.example.demo.dao.RoleDao;
 import com.example.demo.dao.UserDao;
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final UserRepository u;
     private final UserDao userDao;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserDao userDao, RoleDao roleDao, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository u, UserDao userDao, RoleDao roleDao, PasswordEncoder passwordEncoder) {
+        this.u = u;
         this.userDao = userDao;
         this.roleDao = roleDao;
         this.passwordEncoder = passwordEncoder;
     }
-
+    @Transactional
     @Override
-    public void save(User user, boolean encodePassword) {
+    public User save(User user, boolean encodePassword) {
         if (user.getRoles() == null || user.getRoles().size() == 0) {
             List<Role> roles = new ArrayList<>();
             roles.add(roleDao.findByRoleName("ROLE_USER"));
@@ -35,23 +39,24 @@ public class UserServiceImpl implements UserService {
         }
 
         userDao.save(user);
+        return user;
     }
-
+    @Transactional
     @Override
     public List<User> findAll() {
         return userDao.findAll();
     }
-
+    @Transactional
     @Override
     public User findByUsername(String username) {
-        return userDao.findByUsername(username);
+        return u.getUserByFirstNam(username);
     }
-
+    @Transactional
     @Override
     public void delete(Long id) {
         userDao.deleteById(id);
     }
-
+    @Transactional
     @Override
     public User getUser(Long id) {
         return userDao.getById(id);

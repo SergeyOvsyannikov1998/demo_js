@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class AdminRestController {
     private final UserService userService;
 
@@ -18,29 +18,40 @@ public class AdminRestController {
         this.userService = userService;
     }
 
-    @GetMapping("/users")
-    public List<User> showAllUsers() {
-        return userService.findAll();
+    @GetMapping
+    public ResponseEntity<List<User>> showAllUsers() {
+        List<User> users = userService.findAll();
+        return (users != null)
+                ? new ResponseEntity<>(users, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
-        return userService.getUser(id);
+
+        User user= userService.getUser(id);
+        return  (user != null)
+                ? new ResponseEntity<>(user, HttpStatus.FOUND).getBody()
+                : null;
     }
 
-    @PostMapping("/users")
-    public User addNewUser(@RequestBody User user) {
-        userService.save(user, true);
-        return user;
+    @PostMapping
+    public ResponseEntity<Long> addNewUser(@RequestBody User user) {
+        Long id = userService.save(user, false).getId();
+        return (id != 0)
+                ? new ResponseEntity<>(id, HttpStatus.CREATED)
+                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    @PutMapping(value = "/users/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public User editUser(@RequestBody User user) {
-        userService.save(user, false);
-        return user;
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> editUser(@RequestBody User user) {
+        User userNew = userService.save(user, false);
+        return (userNew != null)
+                ? new ResponseEntity<>(user, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.delete(id);

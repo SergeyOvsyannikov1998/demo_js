@@ -13,10 +13,15 @@ import java.util.List;
 @Table(name = "roles")
 public class Role implements GrantedAuthority {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String roleName;
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "roles_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
     @JsonBackReference
     private List<User> users;
 

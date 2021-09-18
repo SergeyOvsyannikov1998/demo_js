@@ -17,7 +17,7 @@ import java.util.List;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
     private String firstname;
@@ -25,7 +25,7 @@ public class User implements UserDetails {
     private byte age;
     private String email;
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="users_roles",
             joinColumns = {@JoinColumn(name="user_id", referencedColumnName="id")},
             inverseJoinColumns = {@JoinColumn(name="roles_id", referencedColumnName="id")}
