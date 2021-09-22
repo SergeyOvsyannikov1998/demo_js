@@ -4,7 +4,6 @@ import com.example.demo.dao.RoleDao;
 import com.example.demo.dao.UserDao;
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,13 +13,11 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepository u;
     private final UserDao userDao;
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository u, UserDao userDao, RoleDao roleDao, PasswordEncoder passwordEncoder) {
-        this.u = u;
+    public UserServiceImpl( UserDao userDao, RoleDao roleDao, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.roleDao = roleDao;
         this.passwordEncoder = passwordEncoder;
@@ -49,7 +46,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User findByUsername(String username) {
-        return u.getUserByFirstNam(username);
+        return userDao.getUserByFirstNam(username);
     }
     @Transactional
     @Override
@@ -60,5 +57,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Long id) {
         return userDao.getById(id);
+    }
+
+    @Override
+    public User update(User user) {
+        return userDao.save(user);
     }
 }

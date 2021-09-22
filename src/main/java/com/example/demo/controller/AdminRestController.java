@@ -45,7 +45,7 @@ public class AdminRestController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> editUser(@RequestBody User user) {
-        User userNew = userService.save(user, false);
+        User userNew = userService.update(user);
         return (userNew != null)
                 ? new ResponseEntity<>(user, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
